@@ -1,1 +1,1 @@
-So, [React](http://facebook.github.io/react/) seems pretty cool.  Let's see what it's all about.
+What's all this [React](http://facebook.github.io/react/) stuff about?
