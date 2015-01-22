@@ -1,1 +1,1 @@
-What's all this [React](http://facebook.github.io/react/) stuff about?
+What's all this [React](http://facebook.github.io/react/docs/tutorial.html#reactive-state) stuff about?
