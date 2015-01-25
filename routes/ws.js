@@ -25,7 +25,8 @@ wss.on('connection', function connection (ws) {
     console.log('sending...');
     var data = JSON.stringify(comments);
     console.log(data);
-    ws.send(data);
+    // ws.send(data);
+    wss.broadcast(data);
   };
 
   ws.on('message', function incoming (message) {
@@ -54,3 +55,9 @@ wss.on('connection', function connection (ws) {
   //   ws.send(JSON.stringify(comments));
   // }, 3000);
 });
+
+wss.broadcast = function broadcast(data) {
+  wss.clients.forEach(function each(client) {
+    client.send(data);
+  });
+};
