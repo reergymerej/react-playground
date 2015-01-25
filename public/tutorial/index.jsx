@@ -15,61 +15,65 @@ var Comment = React.createClass({
 });
 
 var CommentBox = React.createClass({
-  loadCommentsFromServer: function () {
-    this.setState({
-      refreshes: this.state.refreshes + 1
-    });
 
-    $.ajax({
-      url: this.props.url,
-      dataType: 'json',
-      
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this),
-
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
+  createWebSocket: function () {
+    this.ws = ws({
+      url: 'localhost',
+      port: 3001,
+      open: function (event) {
+        console.log('open!', event);
+      },
+      receive: function (message) {
+        this.setState({
+          data: message,
+          updates: this.state.updates + 1
+        });
+      },
+      close: function () {
+        console.log('socket closed');
+      },
+      scope: this
     });
   },
 
   handleCommentSubmit: function (comment) {
     console.log(comment);
     var comments = this.state.data;
-    comments.push(comment);
+    comments.unshift(comment);
+
+    this.ws.send(comment);
+
     this.setState({data: comments}, function() {
       // `setState` accepts a callback. To avoid (improbable) race condition,
       // `we'll send the ajax request right after we optimistically set the new
       // `state.
-      $.ajax({
-        url: this.props.url,
-        dataType: 'json',
-        type: 'POST',
-        data: comment,
-        success: function(data) {
-          this.setState({data: data});
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(this.props.url, status, err.toString());
-        }.bind(this)
-      });
+
+      // $.ajax({
+      //   url: this.props.url,
+      //   dataType: 'json',
+      //   type: 'POST',
+      //   data: comment,
+      //   success: function(data) {
+      //     this.setState({data: data});
+      //   }.bind(this),
+      //   error: function(xhr, status, err) {
+      //     console.error(this.props.url, status, err.toString());
+      //   }.bind(this)
+      // });
     });
   },
 
   // This happens only once, during setup.
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       data: [],
-      refreshes: 0
+      updates: 0
     };
   },
 
   // Called automatically when a component is rendered.
   componentDidMount: function () {
-    console.log('componentDidMount');
-    this.loadCommentsFromServer();
-    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+    this.createWebSocket();
   },
 
   render: function() {
@@ -79,9 +83,9 @@ var CommentBox = React.createClass({
     return (
       <div className="commentBox">
         <h1>Comments</h1>
-        <p>refreshes: {this.state.refreshes}</p>
-        <CommentList data={this.state.data} />
+        <p>updates: {this.state.updates}</p>
         <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+        <CommentList data={this.state.data} />
       </div>
     );
   }
@@ -154,6 +158,6 @@ var CommentForm = React.createClass({
 });
 
 React.render(
-  <CommentBox url="comments.json" pollInterval={2000} />,
+  <CommentBox url="comments.json" />,
   document.getElementById('content')
 );

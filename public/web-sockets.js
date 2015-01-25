@@ -4,16 +4,23 @@ var ws = (function () {
   function Ws(config) {
     var that = this;
     var ws = new WebSocket('ws://' + config.url + ':' + config.port);
+    var scope = config.scope || this;
+
+    this.scope = scope;
     
-    ws.onopen = config.open;
+    ws.onopen = function () {
+      config.open.apply(scope, [config]);
+    };
     
     ws.onmessage = function (message) {
       that.received++;
-      config.receive(JSON.parse(message.data));
+      config.receive.apply(scope, [JSON.parse(message.data)]);
     };
 
     this.ws = ws;
-    this.onClose = config.close;
+    this.onClose = function () {
+      config.close.apply(scope, arguments);
+    };
   };
 
   Ws.prototype.sent = 0;
@@ -26,7 +33,7 @@ var ws = (function () {
 
   Ws.prototype.close = function () {
     this.ws.close();
-    this.onClose();
+    this.onClose.apply(this.scope, arguments);
   };
 
   return function (config) {
@@ -34,16 +41,3 @@ var ws = (function () {
   };
 }());
 
-var socket = ws({
-  url: 'localhost',
-  port: 3001,
-  open: function (event) {
-    console.log('open!', event);
-  },
-  receive: function (message) {
-    console.log('receive', message);
-  },
-  close: function () {
-    console.log('socket closed');
-  }
-});

@@ -3,6 +3,13 @@
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: 3001 });
 
+var comments = [
+  // {
+  //   "author": "Pete Hunt",
+  //   "text": "This is one comment"
+  // }
+];
+
 wss.on('connection', function connection (ws) {
   console.log('connection made to ws');
 
@@ -10,10 +17,22 @@ wss.on('connection', function connection (ws) {
   var received = 0;
   var intervalId;
 
+  var addMessage = function (message) {
+    comments.unshift(message);
+  };
+
+  var sendAll = function () {
+    console.log('sending...');
+    var data = JSON.stringify(comments);
+    console.log(data);
+    ws.send(data);
+  };
+
   ws.on('message', function incoming (message) {
     received++;
-
     console.log('received: %s', message);
+    addMessage(JSON.parse(message));
+    sendAll();
   });
 
   ws.on('close', function close() {
@@ -21,14 +40,17 @@ wss.on('connection', function connection (ws) {
     clearInterval(intervalId);
   });
 
-  intervalId = setInterval(function () {
-    sent++;
-    var message = JSON.stringify({
-      id: sent,
-      date: Date.now()
-    });
+  sendAll();
 
-    console.log('sending', message);
-    ws.send(message);
-  }, 3000);
+  // intervalId = setInterval(function () {
+  //   sent++;
+
+  //   addMessage({
+  //     author: 'dude',
+  //     text: 'Current time is:' + Date.now()
+  //   });
+    
+  //   console.log('sending', comments);
+  //   ws.send(JSON.stringify(comments));
+  // }, 3000);
 });
