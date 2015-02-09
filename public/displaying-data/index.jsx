@@ -30,7 +30,7 @@ var LikeButton = React.createClass({
 });
 
 React.render(
-  // <Foo message="hello!" time={ Date.now() } />,
-  <LikeButton />,
+  <Foo message="hello!" time={ Date.now() } />,
+  // <LikeButton />,
   document.getElementById('main')
 );
