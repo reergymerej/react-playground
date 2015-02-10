@@ -1,0 +1,1 @@
+[docs](http://facebook.github.io/react/docs/multiple-components.html)

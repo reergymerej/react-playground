@@ -1,0 +1,1 @@
+[docs](http://facebook.github.io/react/docs/reusable-components.html#mixins)
