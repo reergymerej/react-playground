@@ -1,10 +1,20 @@
 var Fooable = {
   foo: function () {
     console.log('I do the foo.');
+  },
+  componentDidMount: function () {
+    this.foo();
+  }
+};
+
+var Barable = {
+  componentDidMount: function () {
+    console.log('I am Barable.');
   }
 };
 
 var A = React.createClass({
+  mixins: [Fooable, Barable],
   render: function () {
     return (
       <h2>A</h2>
@@ -13,6 +23,7 @@ var A = React.createClass({
 });
 
 var B = React.createClass({
+  mixins: [Barable, Fooable],
   render: function () {
     return (
       <h2>B</h2>
@@ -20,19 +31,8 @@ var B = React.createClass({
   }
 });
 
-var Container = React.createClass({
-  render: function () {
-    return (
-      <div>
-        <A />
-        <B />
-      </div>
-    );
-  }
-});
-
 React.render(
-  <Container />,
+  React.createElement('div', null, [<A />, <B />]),
   document.getElementById('example')
 );
 
