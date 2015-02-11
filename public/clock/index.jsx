@@ -24,7 +24,10 @@ var Clock = React.createClass({
 
     return (
       <div>
-        <Hours value={hours} />:<Minutes value={minutes} />:<Seconds value={seconds} /> <Period date={this.state.time} />
+        <div>
+          <ClockUnit value={hours} />:<ClockUnit value={minutes} />:<ClockUnit value={seconds} /> <Period date={this.state.time} />
+        </div>
+        <a onClick={this.close} href="#">close</a>
       </div>
     );
   },
@@ -39,30 +42,15 @@ var Clock = React.createClass({
 
   componentWillUnmount: function () {
     clearInterval(this.intervalId);
+  },
+
+  close: function (event) {
+    React.unmountComponentAtNode(this.getDOMNode().parentNode);
+    event.preventDefault();
   }
 });
 
-var Hours = React.createClass({
-  mixins: [Padable],
-  render: function () {
-    var value = this.pad(this.props.value, 2);
-    return (
-      <span>{value}</span>
-    );
-  }
-});
-
-var Minutes = React.createClass({
-  mixins: [Padable],
-  render: function () {
-    var value = this.pad(this.props.value, 2);
-    return (
-      <span>{value}</span>
-    );
-  }
-});
-
-var Seconds = React.createClass({
+var ClockUnit = React.createClass({
   mixins: [Padable],
   render: function () {
     var value = this.pad(this.props.value, 2);
